@@ -24,20 +24,41 @@ connection.connect(function(err) {
 });
 
 function start() {
-  inquirer.prompt([
-    {
-      type: "list",
-      name: "Menu_one",
-      message: "What would you like to do?",
-      choices: [
-        "View all employees",
-        "View Departments",
-        "View employees' roles",
-        "Add employee",
-        "Add roles",
-        "Add departments",
-        "Update employee roles"
-      ]
-    }
-  ]);
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "firstMenu",
+        message: "What would you like to do?",
+        choices: [
+          "View all employees",
+          "View Departments",
+          "View employees' roles",
+          "Add employee",
+          "Add roles",
+          "Add departments",
+          "Update employee roles"
+        ]
+      }
+    ])
+    .then(function(results) {
+      if (results.firstMenu === "View all employees") {
+        viewEmployees();
+      } else if (results.firstMenu === "View Departments") {
+        viewDepartments();
+      } else if (results.firstMenu === "View employees' roles") {
+        viewRoles();
+      } else if (results.firstMenu === "Add employee") {
+        addEmployee();
+      } else if (results.firstMenu === "Add roles") {
+        addRoles();
+      } else if (results.firstMenu === "Add departments") {
+        addDepartments();
+      } else if (results.firstMenu === "Update employee roles") {
+        updateEmployeeRoles();
+      }
+    });
 }
+
+
+function viewEmployees()
