@@ -60,12 +60,45 @@ function start() {
     });
 }
 
-
-function viewEmployees(){
-connection.query("SELECT * FROM employee",function(err, res){
-console.table(res);
-})
+function viewEmployees() {
+  connection.query("SELECT * FROM employee", function(err, res) {
+    console.table(res);
+    start();
+  });
 }
-    
 
-  
+function viewDepartments() {
+  connection.query("SELECT * FROM department", function(err, res) {
+    console.table(res);
+    start();
+  });
+}
+
+function viewRoles() {
+  connection.query("SELECT * FROM role", function(err, res) {
+    console.table(res);
+    start();
+  });
+}
+
+function addRoles() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "Title",
+        message: "Enter New Role: "
+      },
+      {
+        type: "input",
+        name: "Salary",
+        message: "Enter New Role's Salary: "
+      },
+      {
+        type: "input",
+        name: "Department_ID",
+        message: "Enter its corresponding Department ID: "
+      }
+    ])
+    start();
+}
