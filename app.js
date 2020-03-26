@@ -81,6 +81,8 @@ function viewRoles() {
   });
 }
 
+
+
 function addRoles() {
   inquirer
     .prompt([
@@ -99,6 +101,21 @@ function addRoles() {
         name: "Department_ID",
         message: "Enter its corresponding Department ID: "
       }
-    ])
-    start();
+    ]).then(function(results) {
+        connection.query(
+            "INSERT INTO role SET ?",
+            {
+              Title: results.Title,
+              Salary: results.Salary,
+              Department_ID: results.Department_ID
+            },
+            function(err) {
+              if (err) throw err;
+              console.log("New role was added successfully!");
+            
+              start();
+            }
+          );
+        });
+    
 }
