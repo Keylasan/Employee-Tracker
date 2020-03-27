@@ -6,6 +6,7 @@ var rolesArray = [];
 var managersArray = [];
 var currentManager;
 var employeesArray = [];
+var currentEmployee;
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -29,7 +30,6 @@ connection.connect(function(err) {
   roleChoices();
   managersChoices();
   employeeChoices();
-  
 });
 //prompting user through first menu and displaying views choices
 function start() {
@@ -93,7 +93,8 @@ function viewRoles() {
 //prompting user and storing input data for adding new employee
 function addEmployee() {
   roleChoices();
-  inquirer.prompt([
+  inquirer
+    .prompt([
       {
         type: "input",
         name: "First_name",
@@ -123,7 +124,7 @@ function addEmployee() {
         data
       ) {
         for (let i = 0; i < data.length; i++) {
-          var name = data[i].First_name +" "+  data[i].Last_name;
+          var name = data[i].First_name + " " + data[i].Last_name;
 
           if (results.Manager_ID === name) {
             currentManager = data[i].ID;
@@ -165,25 +166,25 @@ function roleChoices() {
 }
 
 function managersChoices() {
-  connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(err,res) {
+  connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(
+    err,
+    res
+  ) {
     for (let i = 0; i < res.length; i++) {
-      var name = res[i].First_name +" "+  res[i].Last_name;
+      var name = res[i].First_name + " " + res[i].Last_name;
       managersArray.push(name);
     }
   });
 }
 
-
-
 function employeeChoices() {
   connection.query("SELECT * FROM employee", function(err, res) {
     for (let i = 0; i < res.length; i++) {
-      var name = res[i].First_name +" "+ res[i].Last_name;
+      var name = res[i].First_name + " " + res[i].Last_name;
       employeesArray.push(name);
     }
   });
 }
-
 
 //prompting user and storing input data for roles
 function addRoles() {
@@ -236,12 +237,15 @@ function addDepartments() {
       connection.query(
         "INSERT INTO department SET ?",
         {
-          Name: results.Department_Name,
-      
+          Name: results.Department_Name
         },
         function(err) {
           if (err) throw err;
-          console.log("New "+ results.Department_Name+ " Department was added successfully!");
+          console.log(
+            "New " +
+              results.Department_Name +
+              " Department was added successfully!"
+          );
 
           start();
         }
@@ -249,33 +253,49 @@ function addDepartments() {
     });
 }
 
-
-
-function updateEmployeeRoles(){
- roleChoices();
- employeeChoices();
-  inquirer.prompt([
-    {
-      type: "list",
-      name: "employees",
-      message: "Select which employee to update: ",
-      choices: employeesArray
-    },
-     {
-      type: "list",
-      name: "employeeRoles",
-      message: "Update employee's new role: ",
-      choices: rolesArray
-    }
-  ])
-  .then(function(results) {
-    connection.query("SELECT * FROM employee", function(err, data) {
-      for (let i = 0; i < data.length; i++) {
-        var name = data[i].First_name  +" "+ data[i].Last_name;
-     console.log (results);
-       
+function updateEmployeeRoles() {
+  roleChoices();
+  employeeChoices();
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "employees",
+        message: "Select which employee to update: ",
+        choices: employeesArray
+      },
+      {
+        type: "list",
+        name: "employeeRoles",
+        message: "Update employee's new role: ",
+        choices: rolesArray
       }
+    ])
+    .then(function(results) {
+      connection.query("SELECT * FROM employee", function(err, data) {
+        for (let i = 0; i < data.length; i++) {
+          var name = data[i].First_name + " " + data[i].Last_name;
+          if (results.employees === name) {
+            currentEmployee = data[i].ID;
+          }
+        }
+        connection.query("SELECT * FROM role", function(err, data) {
+          for (let i = 0; i < data.length; i++) {
+            if (results.employeeRoles === data[i].Title) {
+              currentRole = data[i].ID;
+            }
+          }
+          connection.query(
+            "UPDATE employee SET Role_ID ="+currentRole+" WHERE ID ="+currentEmployee+"",
+         
+            function(err) {
+              if (err) throw err;
+              console.log("Employee role was updated successfully!");
 
-    })
-  })
+              start();
+            }
+          );
+        });
+      });
+    });
 }
