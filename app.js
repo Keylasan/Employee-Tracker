@@ -115,9 +115,11 @@ function addEmployee() {
       }
     ])
     .then(function(results) {
-      connection.query("SELECT * FROM employee WHERE ID='1'", function(err, data) {
-        for (let i = 0; i < data.length; i++){
-
+      connection.query("SELECT * FROM employee WHERE ID='1'", function(
+        err,
+        data
+      ) {
+        for (let i = 0; i < data.length; i++) {
           var name = data[i].First_name + data[i].Last_name;
 
           if (results.Manager_ID === name) {
@@ -202,6 +204,32 @@ function addRoles() {
         function(err) {
           if (err) throw err;
           console.log("New role was added successfully!");
+
+          start();
+        }
+      );
+    });
+}
+
+function addDepartments() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "Department_Name",
+        message: "Enter new Department's name: "
+      }
+    ])
+    .then(function(results) {
+      connection.query(
+        "INSERT INTO department SET ?",
+        {
+          Name: results.Department_Name,
+      
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("New "+ results.Department_Name+ " Department was added successfully!");
 
           start();
         }
