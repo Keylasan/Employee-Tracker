@@ -5,7 +5,7 @@ const cTable = require("console.table");
 
 
 var rolesArray = [];
-
+var managersArray = [];
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -33,6 +33,7 @@ connection.connect(function(err) {
   // run the start function after the connection is made to prompt the user
   start();
   roleChoices();
+  managersChoices();
 });
 
 function start() {
@@ -109,13 +110,14 @@ function addEmployee() {
       {
         type: "list",
         name: "Role_ID",
-        message: "Enter new employee's role ID: ",
+        message: "Select new employee's role: ",
         choices: rolesArray
       },
       {
         type: "list",
         name: "Manager_ID",
-        message: "Enter the corresponding Manager_ID: "
+        message: "Select the corresponding Manager: ",
+        choices: managersArray
       }
     ])
     .then(function(results) {
@@ -145,6 +147,17 @@ function roleChoices() {
     });
   }
 
+
+
+
+
+  function managersChoices() {
+    connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(err, res) {
+      for (let i = 0; i < res.length; i++) {
+        managersArray.push(res[i].Title);
+      }
+    });
+  }
 
 
 
