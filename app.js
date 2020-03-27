@@ -1,6 +1,11 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
+
+
+
+var rolesArray = [];
+
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -16,11 +21,18 @@ var connection = mysql.createConnection({
   database: "employees_db"
 });
 
+
+
+
+
+
+
 // connect to the mysql server and sql database
 connection.connect(function(err) {
   if (err) throw err;
   // run the start function after the connection is made to prompt the user
   start();
+  roleChoices();
 });
 
 function start() {
@@ -81,6 +93,59 @@ function viewRoles() {
   });
 }
 
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "First_name",
+        message: "Enter new employees' first name: "
+      },
+      {
+        type: "input",
+        name: "Last_name",
+        message: "Enter new employee's last name: "
+      },
+      {
+        type: "list",
+        name: "Role_ID",
+        message: "Enter new employee's role ID: ",
+        choices: rolesArray
+      },
+      {
+        type: "list",
+        name: "Manager_ID",
+        message: "Enter the corresponding Manager_ID: "
+      }
+    ])
+    .then(function(results) {
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          First_name: results.First_name,
+          Last_name: results.Last_name,
+          Role_ID: results.Role_ID,
+          Manager_ID: results.Manager_ID
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("New employee was added successfully!");
+
+          start();
+        }
+      );
+    });
+}
+
+function roleChoices() {
+    connection.query("SELECT * FROM role", function(err, res) {
+      for (let i = 0; i < res.length; i++) {
+        rolesArray.push(res[i].Title);
+      }
+    });
+  }
+
+
 
 
 function addRoles() {
@@ -101,21 +166,21 @@ function addRoles() {
         name: "Department_ID",
         message: "Enter its corresponding Department ID: "
       }
-    ]).then(function(results) {
-        connection.query(
-            "INSERT INTO role SET ?",
-            {
-              Title: results.Title,
-              Salary: results.Salary,
-              Department_ID: results.Department_ID
-            },
-            function(err) {
-              if (err) throw err;
-              console.log("New role was added successfully!");
-            
-              start();
-            }
-          );
-        });
-    
+    ])
+    .then(function(results) {
+      connection.query(
+        "INSERT INTO role SET ?",
+        {
+          Title: results.Title,
+          Salary: results.Salary,
+          Department_ID: results.Department_ID
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("New role was added successfully!");
+
+          start();
+        }
+      );
+    });
 }
