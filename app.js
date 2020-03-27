@@ -4,6 +4,7 @@ const cTable = require("console.table");
 var currentRole;
 var rolesArray = [];
 var managersArray = [];
+var currentManager;
 // create the connection information for the sql database
 var connection = mysql.createConnection({
   host: "localhost",
@@ -27,7 +28,7 @@ connection.connect(function(err) {
   roleChoices();
   managersChoices();
 });
-
+//prompting user through first menu and displaying views choices
 function start() {
   inquirer
     .prompt([
@@ -86,6 +87,7 @@ function viewRoles() {
   });
 }
 
+//prompting user and storing input data for adding new employee
 function addEmployee() {
   inquirer
     .prompt([
@@ -113,54 +115,63 @@ function addEmployee() {
       }
     ])
     .then(function(results) {
-     connection.query("SELECT * FROM role", function(err,data){
+      connection.query("SELECT * FROM employee WHERE ID='1'", function(err, data) {
         for (let i = 0; i < data.length; i++){
-          if (results.Role_ID === data[i].Title) { 
-           currentRole = data[i].ID
-          }
-        
-      }
-        connection.query(
-        "INSERT INTO employee SET ?",
-        {
-          First_name: results.First_name,
-          Last_name: results.Last_name,
-          Role_ID: currentRole,
-          Manager_ID: results.Manager_ID
-        },
-        function(err) {
-          if (err) throw err;
-          console.log("New employee was added successfully!");
 
-          start();
+          var name = data[i].First_name + data[i].Last_name;
+
+          if (results.Manager_ID === name) {
+            currentManager = data[i].ID;
+          }
         }
-     );
+
+        connection.query("SELECT * FROM role", function(err, data) {
+          for (let i = 0; i < data.length; i++) {
+            if (results.Role_ID === data[i].Title) {
+              currentRole = data[i].ID;
+            }
+          }
+          connection.query(
+            "INSERT INTO employee SET ?",
+            {
+              First_name: results.First_name,
+              Last_name: results.Last_name,
+              Role_ID: currentRole,
+              Manager_ID: currentManager
+            },
+            function(err) {
+              if (err) throw err;
+              console.log("New employee was added successfully!");
+
+              start();
+            }
+          );
+        });
+      });
     });
-})}
+}
 
 function roleChoices() {
-    connection.query("SELECT * FROM role", function(err, res) {
-      for (let i = 0; i < res.length; i++) {
-        rolesArray.push(res[i].Title);
-      }
-    });
-  }
+  connection.query("SELECT * FROM role", function(err, res) {
+    for (let i = 0; i < res.length; i++) {
+      rolesArray.push(res[i].Title);
+    }
+  });
+}
 
+function managersChoices() {
+  connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(
+    err,
+    res
+  ) {
+    for (let i = 0; i < res.length; i++) {
+      var name = res[i].First_name + res[i].Last_name;
+      managersArray.push(name);
+    }
+  });
+}
 
-
-
-
-  function managersChoices() {
-    connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(err, res) {
-      for (let i = 0; i < res.length; i++) {
-        var name = res[i].First_name + res[i].Last_name;
-        managersArray.push(name);
-      }
-    });
-  }
-
-
-
+//prompting user and storing input data for roles
 function addRoles() {
   inquirer
     .prompt([
