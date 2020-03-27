@@ -1,7 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-
+var currentRole;
 var rolesArray = [];
 var managersArray = [];
 // create the connection information for the sql database
@@ -115,7 +115,9 @@ function addEmployee() {
     .then(function(results) {
      connection.query("SELECT * FROM role", function(err,data){
         for (let i = 0; i < data.length; i++){
-          if (test) { }
+          if (results.Role_ID === data[i].Title) { 
+           currentRole = data[i].ID
+          }
         
       }
         connection.query(
@@ -123,7 +125,7 @@ function addEmployee() {
         {
           First_name: results.First_name,
           Last_name: results.Last_name,
-          Role_ID: results.Role_ID,
+          Role_ID: currentRole,
           Manager_ID: results.Manager_ID
         },
         function(err) {
