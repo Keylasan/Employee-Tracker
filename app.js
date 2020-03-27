@@ -2,8 +2,6 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
-
-
 var rolesArray = [];
 var managersArray = [];
 // create the connection information for the sql database
@@ -21,16 +19,10 @@ var connection = mysql.createConnection({
   database: "employees_db"
 });
 
-
-
-
-
-
-
 // connect to the mysql server and sql database
 connection.connect(function(err) {
   if (err) throw err;
-  // run the start function after the connection is made to prompt the user
+  // run the start function(s) after the connection is made to prompt the user
   start();
   roleChoices();
   managersChoices();
@@ -121,7 +113,12 @@ function addEmployee() {
       }
     ])
     .then(function(results) {
-      connection.query(
+     connection.query("SELECT * FROM role", function(err,data){
+        for (let i = 0; i < data.length; i++){
+          if (test) { }
+        
+      }
+        connection.query(
         "INSERT INTO employee SET ?",
         {
           First_name: results.First_name,
@@ -135,9 +132,9 @@ function addEmployee() {
 
           start();
         }
-      );
+     );
     });
-}
+})}
 
 function roleChoices() {
     connection.query("SELECT * FROM role", function(err, res) {
@@ -154,7 +151,8 @@ function roleChoices() {
   function managersChoices() {
     connection.query("SELECT * FROM employee WHERE Role_ID='1' ", function(err, res) {
       for (let i = 0; i < res.length; i++) {
-        managersArray.push(res[i].Title);
+        var name = res[i].First_name + res[i].Last_name;
+        managersArray.push(name);
       }
     });
   }
